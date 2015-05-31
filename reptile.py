@@ -3,7 +3,7 @@
 
 from optparse import OptionParser  
 
-usage="usage:%prog -u http://url [ -t timeout ] -n maxnum -d maxdepth " 
+usage="usage:%prog -u http://url [ -t timeout ] -n maxnum -d maxdepth -p storysite " 
  
 parser = OptionParser(usage)
 parser.add_option("-t", "--timeout",  
@@ -21,12 +21,14 @@ parser.add_option("-u", "--url",
                 )  
 parser.add_option("-n", "--number",  
                 action = "store",  
+                type = 'int',  
                 dest = "maxnum",  
                 default = None,  
                 help = "Specify the max numbers of target pages"  
                 )  
 parser.add_option("-d", "--depth",  
                 action = "store",  
+                type = 'int',  
                 dest = "depth",  
                 default = None,  
                 help = "Specify the max depth of target pages"  
