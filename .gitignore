@@ -1,1 +1,2 @@
-api/__init__.pyc api/parsers.pyc api/web.pyc
+api/*.pyc 
+./*.pyc
