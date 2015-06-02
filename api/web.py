@@ -5,13 +5,13 @@ import urllib2
 import re
 import parsers
 
-def webGet(url):
+def getWebByUrl(url):
   website = urllib2.urlopen(url)
   #read html code
   html = website.read()
   return html
 
-def webFindUrl(html):
+def findUrlByWeb(html):
   #use re.findall to get all the links
   links = re.findall('"((http|ftp)s?://.*?)"', html)
   return links

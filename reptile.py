@@ -40,7 +40,7 @@ class WebCrawler:
                            action = "store",
                            type = 'int',
                            dest = "depth",
-                           default = None,
+                           default = 2,
                            help = "Specify the max depth of target pages"
                            )
     self.parser.add_option("-p", "--path",
@@ -65,7 +65,7 @@ class WebCrawler:
       print os.path.basename(os.path.realpath(sys.argv[0])) + self.usage[5:] 
       exit()
     
-    self.startURL.append( [(self.opts.url, "http"), 1])
+    self.startURL.append( [self.opts.url, 1])
 
   def PraseProc(self):
     print self.opts.url 
@@ -83,17 +83,25 @@ class WebCrawler:
     pass
 
   def getUrlByString(self, url, depth):
-    print url
-    html = web.webGet(url)
-    links = web.webFindUrl(html)
-    for l in links:
-      self.startURL.append([l, depth + 1])
+    if depth < self.opts.depth:
+      html = web.getWebByUrl(url)
+      links = web.findUrlByWeb(html)
+      for link in links:
+        self.startURL.append([link[0], depth + 1])
+
+  def getWebByUrl(self, url):
     pass
 
-  def getWebByUrl():
+  def getHashValue(self, url):
+    return store.getHashValue(url)
+
+  def storeWeb(hashValue, webPage):
+    store.saveFile(hashValue, webPage)
+
+  def mainProc(self):
     pass
 
-  def getHashValue():
+  def updateIndex(self):
     pass
 
 
@@ -104,7 +112,7 @@ if __name__ == "__main__":
   myObj.PraseProc()
 
   a = myObj.startURL[0]
-  url = a[0][0]
+  url = a[0]
   depth = a[1]
   myObj.getUrlByString(url, depth)
 
