@@ -17,8 +17,14 @@ def webFindUrl(html):
   return links
 
 if __name__ == "__main__":
-  url = parsers.MyParser() 
+  url = "http://www.baidu.com" 
   
   html = webGet(url)
   links = webFindUrl(html)
-  print links
+
+  b = []
+  for a in links:
+    b.append(a)
+    print a
+  print "#######################################"
+  print b
