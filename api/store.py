@@ -29,6 +29,11 @@ def storeFile(filename, msg):
   fo.write(msg)
   fo.close()  
 
+def storeFileAppend(filename, msg):
+  fo = open(filename, "a")
+  fo.write(msg)
+  fo.close()
+
 def getFullName(basepath, filename):
   if os.path.isabs(basepath):
     fullName = os.path.join(basepath, filename[0:2], filename[2:]) 
