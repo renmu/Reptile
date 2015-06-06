@@ -111,7 +111,7 @@ class WebCrawler:
   def listUrl(self, url):
     line = self.getOneRecord(url)
     if len(line) == 0:
-      print "url:%s is not Crawled or Crawl Failed"
+      print "url:%s is not Crawled or Crawl Failed"% (url)
     else:
       print "url: %s --> file: %s " % (line[41:-1], store.getFullNameByHash(line[0:41]))
 
