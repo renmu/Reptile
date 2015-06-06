@@ -32,18 +32,30 @@ def storeFile(filename, msg):
 def storeFileAppend(filename, msg):
   fo = open(filename, "a")
   fo.write(msg)
-  fo.close()
+  fo.close() 
 
-def getFullName(basepath, filename):
+def getObjFullName(basepath, filename):
   if os.path.isabs(basepath):
     fullName = os.path.join(basepath, filename[0:2], filename[2:]) 
   else:
     fullName = os.path.join(os.getcwd(), basepath, filename[0:2], filename[2:])
   return fullName
 
-def saveFile(filename, msg, basepath=(os.environ['HOME'] + '/reptile/objs')):
+def getFullName(basepath, filename):
+  if os.path.isabs(basepath):
+    fullName = os.path.join(basepath, filename)
+  else:
+    fullName = os.path.join(os.getcwd(), basepath, filename)
+  return fullName
+
+def storeLogFile(filename, msg, basepath=(os.environ['HOME'] + '/reptile/log')):
   fullName = getFullName(basepath, filename)
+  storeProc(myMkdir, storeFileAppend, os.path.dirname(fullName), fullName, msg) 
+
+def saveFile(filename, msg, basepath=(os.environ['HOME'] + '/reptile/objs')):
+  fullName = getObjFullName(basepath, filename)
   storeProc(myMkdir, storeFile, os.path.dirname(fullName), fullName, msg) 
+
 
 if __name__ == "__main__": 
    saveFile(getHashValue("http://www.baidu.com"), "msg\n", "abc/def")
