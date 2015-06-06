@@ -4,6 +4,7 @@
 from optparse import OptionParser  
 from api import store
 import urllib2
+import urllib
 import time
 import thread
 import re
@@ -66,6 +67,9 @@ class WebCrawler:
                            )
 
   def ParseArgs(self):
+    """
+    解析命令行参数
+    """
     (opts, args) = self.parser.parse_args()
     self.opts = opts
     self.args = args
@@ -80,10 +84,33 @@ class WebCrawler:
     self.path     = opts.depth
     self.timeout  = opts.timeout
     self.startURL = [self.opts.url, 1]
+    self.domain   = self.getDomainByUrl(self.opts.url)
     self.unProcessURLS.append([self.opts.url, 1])
+    print self.domain
+  
+  def getDomainByUrl(self, url):
+    """
+    通过url获取域名
+    """
+    proto, rest = urllib.splittype(url)
+    host, rest = urllib.splithost(rest)
+    host, port = urllib.splitport(host)
+    return host   
+
+  def urlIsOutLinkStation(self, url):
+    """
+    判断是否为站外链接
+    """
+    host = self.getDomainByUrl(url)
+    #if host.find(self.domain):
+    #  return True
+    return False
 
   def getOneRecord(self, url):
-    if False == os.path.exists(self.indexfile):
+    """
+    读取url爬取记录，如果已经爬取则获返回记录条目
+    """
+    if not os.path.exists(self.indexfile):
       return "" 
     f = open(self.indexfile, "r")
     line = f.readline()
@@ -102,6 +129,9 @@ class WebCrawler:
        return ""
 
   def urlIsCrawlOver(self, url):
+    """
+    判断改url是否已经爬取过了
+    """
     line = self.getOneRecord(url)
     if len(line) == 0:
       return False
@@ -109,6 +139,9 @@ class WebCrawler:
       return True
 
   def listUrl(self, url):
+    """
+    显示指定的url 对应的文件
+    """
     line = self.getOneRecord(url)
     if len(line) == 0:
       print "url:%s is not Crawled or Crawl Failed"% (url)
@@ -116,7 +149,10 @@ class WebCrawler:
       print "url: %s --> file: %s " % (line[41:-1], store.getFullNameByHash(line[0:41]))
 
   def listAUrl(self):
-    if False == os.path.exists(self.indexfile):
+    """
+    显示所有的url 以及对应的文件
+    """
+    if not os.path.exists(self.indexfile):
       print "index file not found"
       return None
     f = open(self.indexfile, "r")
@@ -125,23 +161,31 @@ class WebCrawler:
       print "url: %s --> file: %s " % (line[41:-1], store.getFullNameByHash(line[0:41]))
       line = f.readline()
 
-  def addReport(reportMsg):
-    print reportMsg
-  
   def addWebFailed(self, errorMsg):
+    """
+    记录网页抓取错误的log 
+    """
     self.fileLock.acquire()
     store.storeLogFile("errorlog", errorMsg + "\n")
     self.fileLock.release()
 
   def getUrlByString(self, webPage, depth):
+    """
+    从页面获取url
+    """
     if depth < self.opts.depth and self.pageCnts < self.maxnum:
       links = re.findall('"((http|ftp)s?://.*?)"', webPage)
       self.listLock.acquire()
       for link in links:
-        self.unProcessURLS.append([link[0], depth + 1])
+        # 如果站外链接定定义需要修改的话只修改站外链接判断函数即可
+        if not self.urlIsOutLinkStation(link[0]):
+          self.unProcessURLS.append([link[0], depth + 1])
       self.listLock.release()
 
   def getWebByUrl(self, url):
+    """
+    通过url获取页面
+    """
     try:
       html = urllib2.urlopen(url, timeout = self.opts.timeout)
       webPage =  html.read()
@@ -150,17 +194,25 @@ class WebCrawler:
       self.addWebFailed(errorMsg) 
       print errorMsg
       webPage = None
-      pass
     
     return webPage
 
   def getHashValue(self, url):
+    """
+    将url转换成hash值
+    """
     return store.getHashValue(url)
 
   def storeWeb(self, hashValue, webPage):
+    """
+    保存页面
+    """
     store.saveFile(hashValue, webPage)
 
   def urlProcTask(self, url, depth):
+    """
+    抓取工作任务，多线程实例
+    """
     webPage = self.getWebByUrl(url)
     if webPage != None:
       self.getUrlByString(webPage, depth) 
@@ -176,6 +228,9 @@ class WebCrawler:
     self.listLock.release()
 
   def mainProc(self):
+    """
+    主处理流程，控制线程数量，启动抓取url线程抓取
+    """
     while len(self.unProcessURLS) > 0 or self.threadCnts > 0:
       if len(self.unProcessURLS) > 0:
         if self.threadCnts < self.maxThreads:
@@ -186,11 +241,17 @@ class WebCrawler:
           thread.start_new_thread( self.urlProcTask, (unURL[0], unURL[1]) )
 
   def updateIndex(self, indexMsg):
+    """
+    抓取页面保存后更新index文件，多线程操作需要锁保护
+    """
     self.fileLock.acquire()
     store.storeFileAppend(self.indexfile, indexMsg)
     self.fileLock.release()
 
   def cmdProc(self):
+    """
+    命令行启动处理入口
+    """
     self.ParseArgs()
     if True == self.show:
       if None == self.opts.url:
