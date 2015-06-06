@@ -45,6 +45,6 @@ Options:
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx http://url
 
 ~/reptile/log/errorlog
-记录抓取过程中，连接超时或者页面错误，的url
+记录抓取过程中，连接超时或者页面错误，的url 和错误原因
 
 
