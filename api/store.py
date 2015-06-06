@@ -52,6 +52,9 @@ def storeLogFile(filename, msg, basepath=(os.environ['HOME'] + '/reptile/log')):
   fullName = getFullName(basepath, filename)
   storeProc(myMkdir, storeFileAppend, os.path.dirname(fullName), fullName, msg) 
 
+def getFullNameByHash(hashValue, basepath=(os.environ['HOME'] + '/reptile/objs')):
+  return getObjFullName(basepath, hashValue)
+
 def saveFile(filename, msg, basepath=(os.environ['HOME'] + '/reptile/objs')):
   fullName = getObjFullName(basepath, filename)
   storeProc(myMkdir, storeFile, os.path.dirname(fullName), fullName, msg) 
